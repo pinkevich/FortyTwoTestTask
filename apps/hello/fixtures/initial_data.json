@@ -1,0 +1,34 @@
+[
+  {
+    "model": "hello.bio",
+    "fields": {
+      "skype": "pinkevich.net",
+      "last_name": "Pinkevich",
+      "bio": "",
+      "other_contacts": "",
+      "jabber": "pinkevich@jabber.ru",
+      "email": "my@pinkevich.net",
+      "first_name": "Alexander",
+      "date_of_birth": "1993-03-15"
+    },
+    "pk": 1
+  },
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": true,
+      "is_staff": true,
+      "last_login": "2015-08-20T12:06:11.620Z",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$12000$Kia8wshmbymI$PAKdj1bofIw1nFzEUbcEhP2Md/FGNbU2FAcBy1kYQmo=",
+      "email": "admin@example.com",
+      "date_joined": "2015-08-20T12:06:11.620Z"
+    }
+  }
+]

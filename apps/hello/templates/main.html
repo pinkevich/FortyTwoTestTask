@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Main page - {% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h1>42 Coffee Cups Test Assignment</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p>Name: {{ bio.first_name }}</p>
+                <p>Last name: {{ bio.last_name }}</p>
+                <p>Date of birth: {{ bio.date_of_birth }}</p>
+                <p>Bio:</p>
+                <p>{{ bio.bio }}</p>
+            </div>
+            <div class="col-md-6">
+                <p>Contacts</p>
+                <p>Email: {{ bio.email }}</p>
+                <p>Jabber: {{ bio.jabber }}</p>
+                <p>Skype: {{ bio.skype }}</p>
+                <p>Other contacts:</p>
+                <p>{{ bio.other_contacts }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
