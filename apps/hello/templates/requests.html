@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Requests page - {% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h4>Last requests</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-4 requests-menu"></div>
+            <div class="col-md-8 requests-body"></div>
+        </div>
+        {% csrf_token %}
+        <a href="{% url 'hello:main' %}">Home</a>
+    </div>
+    {% block extra_js %}
+        <script src="{% static 'js/requests.js' %}"></script>
+    {% endblock extra_js %}
+{% endblock %}

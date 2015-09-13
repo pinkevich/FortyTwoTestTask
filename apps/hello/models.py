@@ -18,3 +18,18 @@ class Bio(models.Model):
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.first_name, self.last_name)
+
+
+class HttpRequest(models.Model):
+    ip = models.CharField('Remote address', max_length=255)
+    page = models.URLField('View page')
+    time = models.DateTimeField('Time', auto_now_add=True)
+    header = models.TextField('Header')
+    is_read = models.BooleanField('Is read', default=False)
+
+    class Meta:
+        verbose_name = 'Request'
+        verbose_name_plural = 'Requests'
+
+    def __unicode__(self):
+        return u'{0} - {1}'.format(self.ip, self.page)

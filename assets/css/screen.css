@@ -1,1 +1,13 @@
- 
+.requests-menu, .requests-body {
+    border: solid #1b6d85 1px;
+    min-height: 500px;
+    max-height: 500px;
+    padding: 10px;
+    overflow-y: scroll;
+}
+.request-simple {
+    cursor: pointer;
+}
+.is-new {
+    color: green;
+}
