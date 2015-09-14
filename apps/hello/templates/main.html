@@ -11,7 +11,7 @@
                 <p>Last name: {{ bio.last_name }}</p>
                 <p>Date of birth: {{ bio.date_of_birth }}</p>
                 <p>Bio:</p>
-                <p>{{ bio.bio }}</p>
+                <p>{{ bio.bio|linebreaks }}</p>
             </div>
             <div class="col-md-6">
                 <p>Contacts</p>
@@ -19,7 +19,7 @@
                 <p>Jabber: {{ bio.jabber }}</p>
                 <p>Skype: {{ bio.skype }}</p>
                 <p>Other contacts:</p>
-                <p>{{ bio.other_contacts }}</p>
+                <p>{{ bio.other_contacts|linebreaks }}</p>
             </div>
         </div>
         <div>
