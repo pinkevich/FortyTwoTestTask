@@ -50,7 +50,7 @@ class HelloTests(TestCase):
 
     def test_main_page_not_bio(self):
         """
-        If not objects in bio  model
+        If not objects in bio model
         """
         Bio.objects.all().delete()
         url = reverse_lazy('hello:main')
