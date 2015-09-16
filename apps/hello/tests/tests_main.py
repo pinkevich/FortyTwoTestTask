@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse_lazy
 
 from .tests import BaseTestCase
-from .models import Bio
+from ..models import Bio
 
 
 class HelloTests(BaseTestCase):

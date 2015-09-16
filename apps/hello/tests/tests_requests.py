@@ -3,7 +3,7 @@ import ast
 from django.core.urlresolvers import reverse_lazy
 
 from .tests import BaseTestCase
-from .models import HttpRequest
+from ..models import HttpRequest
 
 
 class HttpRequestTests(BaseTestCase):
