@@ -1,12 +1,13 @@
 import json
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http.response import HttpResponse
 from django.core.serializers import serialize
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 from .models import Bio, HttpRequest
 from .utils import save_requests
+from .forms import BioEditForm
 
 
 @save_requests()
@@ -29,3 +30,19 @@ def http_requests(request):
                 data = json.dumps({'success': True})
         return HttpResponse(data)
     return render(request, 'requests.html')
+
+
+@save_requests()
+@login_required()
+def edit(request):
+    form = BioEditForm(instance=Bio.objects.first())
+    if request.is_ajax() and request.method == 'POST':
+        form = BioEditForm(request.POST, request.FILES,
+                           instance=Bio.objects.first())
+        if form.is_valid():
+            form.save()
+            data = json.dumps({'success': True})
+        else:
+            data = json.dumps({'success': False, 'errors': form.errors})
+        return HttpResponse(data)
+    return render(request, 'edit.html', {'form': form})

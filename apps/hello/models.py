@@ -11,6 +11,8 @@ class Bio(models.Model):
     jabber = models.CharField('Jabber', max_length=255, blank=True)
     skype = models.CharField('Skype', max_length=255, blank=True)
     other_contacts = models.TextField('Other contacts', blank=True)
+    photo = models.ImageField('Photo', upload_to='photos',
+                              blank=True, null=True)
 
     class Meta:
         verbose_name = 'Bio'
