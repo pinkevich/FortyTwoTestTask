@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from PIL import Image
+
 
 class Bio(models.Model):
     first_name = models.CharField('Name', max_length=50)
@@ -20,6 +22,16 @@ class Bio(models.Model):
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.first_name, self.last_name)
+
+    def save(self, *args, **kwargs):
+        super(Bio, self).save(*args, **kwargs)
+        if self.photo:
+            self.photo_resize()
+
+    def photo_resize(self, size=(200, 200)):
+        img = Image.open(self.photo)
+        img.thumbnail(size, Image.ANTIALIAS)
+        img.save(self.photo.path)
 
 
 class HttpRequest(models.Model):

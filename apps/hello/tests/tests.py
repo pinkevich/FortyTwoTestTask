@@ -25,6 +25,3 @@ class BaseTestCase(TestCase):
         file.name = 'test.png'
         file.seek(0)
         return file
-
-    def empty_file(self):
-        return BytesIO()
