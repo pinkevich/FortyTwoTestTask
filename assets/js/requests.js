@@ -1,67 +1,76 @@
 $(document).ready(function () {
     var oldTitle = document.title;
-    var titleReqCount = 0;
-    var dataRequests = {};
+    var titleCount = 0;
+    var dataRequests = [];
+    var newRequests = null;
+
     var getRequests = function () {
         $.ajax({
             url: '/requests/'
         }).done(function (response) {
-            dataRequests = JSON.parse(response);
-            _.each(dataRequests, function (item) {
+            newRequests = JSON.parse(response);
+            _.each(newRequests, function (item) {
                 if (!$('#request-' + item.pk).length) {
                     $('.requests-menu').append(
                         '<p class="request-simple" data-id="' + item.pk + '" id="request-' + item.pk + '">' +
                         '<span class="is-new">[N] </span>' + item.fields.page + '</p>'
                     );
-                    titleReqCount += 1;
+                    titleCount += 1;
+                    dataRequests.push(item);
                 }
             });
         });
         changeTitle();
     };
 
+    $(window).focus(function () {
+        if (dataRequests.length) {
+            isRead();
+        }
+        $(document).attr('title', oldTitle);
+    });
+
     var changeTitle = function () {
-        if (titleReqCount) {
-            $(document).attr('title', titleReqCount + ' request(s)')
-        } else {
-            $(document).attr('title', oldTitle)
+        if (titleCount) {
+            $(document).attr('title', titleCount + ' request(s)')
         }
     };
 
-    var isRead = function (pk) {
-        $.ajax({
-            url: '/requests/',
-            type: 'POST',
-            dataType: 'json',
-            data: {csrfmiddlewaretoken: csrftoken, request_pk: pk},
-            success: function (response) {
-                if (response.success) {
-                    titleReqCount -= 1;
+    var isRead = function () {
+        _.each(dataRequests, function (item) {
+            $.ajax({
+                url: '/requests/',
+                type: 'POST',
+                dataType: 'json',
+                data: {csrfmiddlewaretoken: csrftoken, request_pk: item.pk},
+                success: function (response) {
+                    if (response.success) {
+                        titleCount -= 1;
+                    }
                 }
-            }
-        })
+            })
+        });
+        dataRequests = [];
     };
 
     $('body').on('click', '.request-simple', function (e) {
         event.preventDefault();
         $(e.toElement).find('.is-new').remove();
         var requestsBody = $('.requests-body');
-        var requestId = $(e.toElement).data('id');
-        var dataRequest = _.find(dataRequests, function (obj) {
-            return obj.pk == requestId
+        var newRequest = _.find(newRequests, function (obj) {
+            return obj.pk == $(e.toElement).data('id');
         });
         requestsBody.children().remove();
         requestsBody.append(
             '<div>' +
-            '<p>ID: ' + dataRequest.pk + '</p>' +
-            '<p>Remote address: ' + dataRequest.fields.ip + '</p>' +
-            '<p>Open page: <a href="' + dataRequest.fields.page + '" target="_blank">' + dataRequest.fields.page + '</a></p>' +
-            '<p>Date/Time: ' + dataRequest.fields.time + '</p>' +
+            '<p>ID: ' + newRequest.pk + '</p>' +
+            '<p>Remote address: ' + newRequest.fields.ip + '</p>' +
+            '<p>Open page: <a href="' + newRequest.fields.page + '" target="_blank">' + newRequest.fields.page + '</a></p>' +
+            '<p>Date/Time: ' + newRequest.fields.time + '</p>' +
             '<p>Headers:</p>' +
-            '<p>' + dataRequest.fields.header + '</p>' +
+            '<p>' + newRequest.fields.header + '</p>' +
             '</div>'
         );
-        isRead(requestId);
     });
 
     getRequests();
