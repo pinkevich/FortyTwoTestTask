@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 from django.core.urlresolvers import reverse_lazy
 
 from .tests import BaseTestCase
@@ -59,3 +60,19 @@ class HelloTests(BaseTestCase):
         self.assertEqual(Bio.objects.count(), 0)
         self.assertEqual(resp.context['bio'], None)
         self.assertTemplateUsed(resp, 'main.html')
+
+    def test_main_page_cyrillic_bio(self):
+        """
+        Test when in bio fields cyrillic text
+        """
+        bio = Bio.objects.first()
+        bio.first_name = 'Тест'
+        bio.last_name = 'Тест'
+        bio.save()
+        url = reverse_lazy('hello:main')
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(Bio.objects.count(), 1)
+        self.assertEqual(resp.context['bio'], bio)
+        self.assertContains(resp, 'Тест')
+        self.assertContains(resp, 'Тест')
