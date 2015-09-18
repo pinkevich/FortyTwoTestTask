@@ -66,13 +66,13 @@ class HelloTests(BaseTestCase):
         Test when in bio fields cyrillic text
         """
         bio = Bio.objects.first()
-        bio.first_name = 'Имя'
-        bio.last_name = 'Фамилия'
+        bio.first_name = u'Имя'
+        bio.last_name = u'Фамилия'
         bio.save()
         url = reverse_lazy('hello:main')
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(Bio.objects.count(), 1)
         self.assertEqual(resp.context['bio'], bio)
-        self.assertContains(resp, 'Имя')
-        self.assertContains(resp, 'Фамилия')
+        self.assertContains(resp, u'Имя')
+        self.assertContains(resp, u'Фамилия')
