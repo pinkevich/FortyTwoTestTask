@@ -10,3 +10,4 @@ class Command(BaseCommand):
             data = '{0} - {1} records'.format(model.__name__,
                                               model.objects.count())
             self.stdout.write(data)
+            self.stderr.write('error: ' + data)

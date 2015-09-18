@@ -35,3 +35,23 @@ class HttpRequest(models.Model):
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.ip, self.page)
+
+
+class History(models.Model):
+    CREATED, EDITED, DELETED = range(1, 4)
+    ACTION_CHOICES = (
+        (CREATED, 'Created'),
+        (EDITED, 'Edited'),
+        (DELETED, 'Deleted'),
+    )
+    model_name = models.CharField('Model name', max_length=255)
+    model_instance = models.CharField('Instance', max_length=255)
+    action = models.PositiveIntegerField('Action', choices=ACTION_CHOICES)
+    date = models.DateTimeField('Date', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Model history'
+        verbose_name_plural = 'Models history'
+
+    def __unicode__(self):
+        return u'{0} - {1}'.format(self.model_name, self.model_instance)
