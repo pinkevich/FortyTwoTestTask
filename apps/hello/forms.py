@@ -1,17 +1,16 @@
 from datetime import date
 
 from django import forms
+from django.contrib.admin.widgets import AdminDateWidget
 
 from .models import Bio
 
 
 class BioEditForm(forms.ModelForm):
+    date_of_birth = forms.DateField(widget=AdminDateWidget)
 
     class Meta:
         model = Bio
-        widgets = {
-            'date_of_birth': forms.DateInput(format='%Y-%m-%d')
-        }
 
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data.get('date_of_birth')

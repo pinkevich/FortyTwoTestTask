@@ -1,6 +1,7 @@
 from django.core.urlresolvers import reverse_lazy
 from django.conf.global_settings import LOGIN_URL
 
+from fortytwo_test_task.settings import WIDTH_PHOTO_RESIZE, HEIGHT_PHOTO_RESIZE
 from .tests import BaseTestCase
 from ..models import Bio
 
@@ -110,5 +111,28 @@ class EditTests(BaseTestCase):
         )
         self.assertTrue(resp['success'])
         self.assertTrue(self.bio.photo)
-        self.assertEqual(self.bio.photo.width, 200)
-        self.assertEqual(self.bio.photo.height, 200)
+        self.assertEqual(self.bio.photo.width, WIDTH_PHOTO_RESIZE)
+        self.assertEqual(self.bio.photo.height, HEIGHT_PHOTO_RESIZE)
+
+    def test_save_bio_photo_resize_ratio(self):
+        """
+        Test save/update bio photo auto-resize and ratio
+        after save using ajax
+        """
+        photo = self.create_test_photo(size=(300, 500))
+        resp = self.json_response(
+            self.post_ajax(self.edit_url, self.get_post_data(photo=photo))
+        )
+        self.assertTrue(resp['success'])
+        self.assertTrue(self.bio.photo)
+        self.assertEqual(self.bio.photo.width, 120)
+        self.assertEqual(self.bio.photo.height, HEIGHT_PHOTO_RESIZE)
+
+        photo = self.create_test_photo(size=(500, 300))
+        resp = self.json_response(
+            self.post_ajax(self.edit_url, self.get_post_data(photo=photo))
+        )
+        self.assertTrue(resp['success'])
+        self.assertTrue(self.bio.photo)
+        self.assertEqual(self.bio.photo.width, WIDTH_PHOTO_RESIZE)
+        self.assertEqual(self.bio.photo.height, 120)
