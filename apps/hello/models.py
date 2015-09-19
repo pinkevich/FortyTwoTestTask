@@ -3,6 +3,8 @@ from django.db import models
 
 from PIL import Image
 
+from fortytwo_test_task.settings import WIDTH_PHOTO_RESIZE, HEIGHT_PHOTO_RESIZE
+
 
 class Bio(models.Model):
     first_name = models.CharField('Name', max_length=50)
@@ -26,11 +28,14 @@ class Bio(models.Model):
     def save(self, *args, **kwargs):
         super(Bio, self).save(*args, **kwargs)
         if self.photo:
-            self.photo_resize()
+            if self.photo.width > WIDTH_PHOTO_RESIZE \
+                    or self.photo.height > HEIGHT_PHOTO_RESIZE:
+                self.photo_resize()
 
-    def photo_resize(self, size=(200, 200)):
-        img = Image.open(self.photo)
-        img.thumbnail(size, Image.ANTIALIAS)
+    def photo_resize(self):
+        img = Image.open(self.photo.path)
+        img.thumbnail((WIDTH_PHOTO_RESIZE, HEIGHT_PHOTO_RESIZE),
+                      Image.ANTIALIAS)
         img.save(self.photo.path)
 
 

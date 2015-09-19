@@ -1,11 +1,4 @@
 $(document).ready(function () {
-    $(function () {
-        $('#id_date_of_birth').datetimepicker({
-            format: 'YYYY-MM-DD',
-            showClear: true,
-            showClose: true
-        });
-    });
 
     function readURL(input) {
 

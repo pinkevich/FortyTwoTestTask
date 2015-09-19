@@ -23,7 +23,7 @@
             <p>Date of birth: {{ bio.date_of_birth }}</p>
 
             <p>Photo:</p>
-            <img src="{% if bio.photo %}{{ bio.photo.url }}{% endif %}" width="200px" height="200px" alt="{{ bio.first_name }} photo"/>
+            <img src="{% if bio.photo %}{{ bio.photo.url }}{% endif %}" alt="{{ bio.first_name }} photo"/>
         </div>
         <div class="col-md-6">
             <p>Contacts</p>
