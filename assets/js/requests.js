@@ -2,92 +2,78 @@ $(document).ready(function () {
     var oldTitle = document.title;
     var titleCount = 0;
     var isChangedTitle = false;
-    var isFirstOpenPage = true;
-    var newRequests = [];
-    var tempRequests = [];
     var allRequests = [];
 
     function getRequests() {
         $.ajax({
             url: '/requests/',
             success: function (response) {
-                newRequests = JSON.parse(response);
-                _.each(newRequests, function (item) {
+                _.each(JSON.parse(response), function (item) {
                     if (!$('#request-' + item.pk).length) {
-                        $('.requests-menu').append(
+                        var N = !item.fields.is_read ? '<span class="is-new">[N] </span>' : '';
+                        $('.requests-menu').prepend(
                             '<p class="request-simple" data-id="' + item.pk + '" id="request-' + item.pk + '">' +
-                            '<span class="is-new">[N] </span>' + item.fields.page + '</p>'
+                            N + item.fields.page + '</p>'
                         );
-                        titleCount += 1;
-                        tempRequests.push(item);
+                        if (!item.fields.is_read) {
+                            titleCount += 1;
+                        }
                         allRequests.push(item)
                     }
                 });
-            },
-            complete: function () {
-                if (isChangedTitle) {
-                    if (titleCount) {
-                        $(document).attr('title', titleCount + ' request(s)')
-                    }
-                }
-                if (isFirstOpenPage) {
-                    isFirstOpenPage = false;
-                    isRead();
+            }
+        });
+        if (isChangedTitle && titleCount) {
+            $(document).attr('title', titleCount + ' request(s)')
+        }
+    }
+
+    $(window).focus(function () {
+        isChangedTitle = false;
+        $(document).attr('title', oldTitle);
+    }).blur(function () {
+        isChangedTitle = true;
+    });
+
+    function isRead(pk) {
+        $.ajax({
+            url: '/requests/',
+            type: 'POST',
+            dataType: 'json',
+            data: {csrfmiddlewaretoken: csrftoken, request_pk: pk},
+            success: function (response) {
+                if (response.success) {
+                    titleCount -= 1;
                 }
             }
         });
     }
 
-    getRequests();
-
-    $(window).focus(function () {
-        isChangedTitle = false;
-        $(document).attr('title', oldTitle);
-        isRead();
-    }).blur(function () {
-        isChangedTitle = true;
-    });
-
-    function isRead() {
-        _.each(tempRequests, function (item) {
-            $.ajax({
-                url: '/requests/',
-                type: 'POST',
-                dataType: 'json',
-                data: {csrfmiddlewaretoken: csrftoken, request_pk: item.pk},
-                success: function (response) {
-                    if (response.success) {
-                        titleCount -= 1;
-                    }
-                },
-                complete: function () {
-                    tempRequests = [];
-                }
-            });
-        });
-    }
-
     $('body').on('click', '.request-simple', function (e) {
-        event.preventDefault();
-        $(e.toElement).find('.is-new').remove();
+        var target = e.toElement || e.relatedTarget || e.target;
+        $(target).find('.is-new').remove();
+        var requestId = $(target).data('id');
         var requestsBody = $('.requests-body');
-        var item = _.find(allRequests, function (obj) {
-            return obj.pk == $(e.toElement).data('id');
+        _.find(allRequests, function (obj) {
+            if (obj.pk == requestId) {
+                requestsBody.children().remove();
+                requestsBody.append(
+                    '<div>' +
+                    '<p>ID: ' + obj.pk + '</p>' +
+                    '<p>Remote address: ' + obj.fields.ip + '</p>' +
+                    '<p>Open page: <a href="' + obj.fields.page + '" target="_blank">' + obj.fields.page + '</a></p>' +
+                    '<p>Date/Time: ' + obj.fields.time + '</p>' +
+                    '<p>Headers:</p>' +
+                    '<p>' + obj.fields.header + '</p>' +
+                    '</div>'
+                );
+                isRead(requestId)
+            }
         });
-        requestsBody.children().remove();
-        requestsBody.append(
-            '<div>' +
-            '<p>ID: ' + item.pk + '</p>' +
-            '<p>Remote address: ' + item.fields.ip + '</p>' +
-            '<p>Open page: <a href="' + item.fields.page + '" target="_blank">' + item.fields.page + '</a></p>' +
-            '<p>Date/Time: ' + item.fields.time + '</p>' +
-            '<p>Headers:</p>' +
-            '<p>' + item.fields.header + '</p>' +
-            '</div>'
-        );
     });
 
+    getRequests();
     setInterval(function () {
         getRequests();
-    }, 1000);
+    }, 1500);
 });
