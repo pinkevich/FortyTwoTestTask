@@ -6,7 +6,7 @@ from django.template import Template, Context, TemplateSyntaxError
 from django.contrib.auth.models import User
 
 from .tests import BaseTestCase
-from ..models import History, HttpRequest, Bio
+from ..models import History, HttpRequest
 
 
 class TagTests(BaseTestCase):
@@ -48,32 +48,40 @@ class CommandTests(BaseTestCase):
         call_command('projectmodels', stdout=stdout, stderr=stderr)
         stdout = stdout.getvalue()
         self.assertIn('Session -', stdout)
-        self.assertIn('LogEntry -', stdout)
-        self.assertIn('Permission -', stdout)
-        self.assertIn('Group -', stdout)
-        self.assertIn('User -', stdout)
-        self.assertIn('ContentType -', stdout)
-        self.assertIn('MigrationHistory -', stdout)
         self.assertNotIn('error: ', stdout)
+        models = ['Session', 'LogEntry', 'Permission', 'Group',
+                  'User', 'ContentType', 'Bio', 'HttpRequest',
+                  'History', 'MigrationHistory']
+        records = [0, 0, 30, 0, 1, 10, 1, 0, 12, 0]
+        for out, name, count in zip(stdout.split('\n'), models, records):
+            out = out.strip().split()
+            self.assertEqual(out[0], name)
+            self.assertEqual(out[2], str(count))
+
         stderr = stderr.getvalue()
         self.assertIn('error: Session -', stderr)
+        for err, name, count in zip(stderr.split('\n'), models, records):
+            err = err.strip().split()
+            self.assertEqual(err[0], 'error:')
+            self.assertEqual(err[1], name)
+            self.assertEqual(err[3], str(count))
 
 
 class SignalTests(BaseTestCase):
 
     def setUp(self):
         History.objects.all().delete()
+        self.req = HttpRequest.objects.create(
+            ip='127.0.01', page='/', header={})
 
     def test_history_object_creation(self):
         """
         Test create_or_update_object signal that working
         when creation new object in any models
         """
-        self.client.get(reverse('hello:main'))
-        req = HttpRequest.objects.last()
         h_obj = History.objects.last()
-        self.assertEqual(h_obj.model_name, req._meta.model_name)
-        self.assertEqual(h_obj.model_instance, req.__unicode__())
+        self.assertEqual(h_obj.model_name, self.req._meta.model_name)
+        self.assertEqual(h_obj.model_instance, self.req.__unicode__())
         self.assertEqual(h_obj.action, History.CREATED)
 
     def test_history_object_editing(self):
@@ -81,12 +89,11 @@ class SignalTests(BaseTestCase):
         Test create_or_update_object signal that working
         when editing object in any models
         """
-        bio = Bio.objects.first()
-        bio.first_name = 'Test'
-        bio.save()
+        self.req.is_read = True
+        self.req.save(update_fields=['is_read'])
         h_obj = History.objects.last()
-        self.assertEqual(h_obj.model_name, bio._meta.model_name)
-        self.assertEqual(h_obj.model_instance, bio.__unicode__())
+        self.assertEqual(h_obj.model_name, self.req._meta.model_name)
+        self.assertEqual(h_obj.model_instance, self.req.__unicode__())
         self.assertEqual(h_obj.action, History.EDITED)
 
     def test_history_object_deletion(self):
@@ -94,10 +101,8 @@ class SignalTests(BaseTestCase):
         Test create_or_update_object signal that working
         when deletion object in any models
         """
-        self.client.get(reverse('hello:main'))
-        req = HttpRequest.objects.last()
-        req.delete()
+        self.req.delete()
         h_obj = History.objects.last()
-        self.assertEqual(h_obj.model_name, req._meta.model_name)
-        self.assertEqual(h_obj.model_instance, req.__unicode__())
+        self.assertEqual(h_obj.model_name, self.req._meta.model_name)
+        self.assertEqual(h_obj.model_instance, self.req.__unicode__())
         self.assertEqual(h_obj.action, History.DELETED)
