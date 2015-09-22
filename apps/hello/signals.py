@@ -22,10 +22,10 @@ def create_or_update_object(sender, instance, created, **kwargs):
 
 @receiver(post_delete)  # noqa
 def delete_object(sender, instance, **kwargs):
-    try:
-        if sender != History:
+    if sender != History:
+        try:
             History.objects.create(model_name=instance._meta.model_name,
                                    model_instance=instance,
                                    action=History.DELETED)
-    except OperationalError:
-        pass
+        except OperationalError:
+            pass

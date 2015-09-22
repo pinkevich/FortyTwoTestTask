@@ -45,6 +45,7 @@ class HttpRequest(models.Model):
     time = models.DateTimeField('Time', auto_now_add=True)
     header = models.TextField('Header')
     is_read = models.BooleanField('Is read', default=False)
+    priority = models.NullBooleanField('Priority', default=False)
 
     class Meta:
         verbose_name = 'Request'
