@@ -10,9 +10,8 @@ from .utils import save_requests
 from .forms import BioEditForm
 
 
-@save_requests()
 def main(request):
-    return render(request, 'main.html', {'bio': Bio.objects.first()})
+    return render(request, 'main.html')
 
 
 def http_requests(request):
