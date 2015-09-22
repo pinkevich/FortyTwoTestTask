@@ -94,7 +94,6 @@ class SignalTests(BaseTestCase):
         """
         Test create_or_update_object signal that working
         when editing object in any models
-
         """
         self.req.is_read = True
         self.req.save(update_fields=['is_read'])
