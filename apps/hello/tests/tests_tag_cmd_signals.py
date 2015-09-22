@@ -3,10 +3,14 @@ from io import BytesIO
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from django.template import Template, Context, TemplateSyntaxError
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission, Group
+from django.contrib.sessions.models import Session
+from django.contrib.admin.models import LogEntry, ContentType
+
+from south.models import MigrationHistory
 
 from .tests import BaseTestCase
-from ..models import History, HttpRequest
+from ..models import History, HttpRequest, Bio
 
 
 class TagTests(BaseTestCase):
@@ -52,7 +56,9 @@ class CommandTests(BaseTestCase):
         models = ['Session', 'LogEntry', 'Permission', 'Group',
                   'User', 'ContentType', 'Bio', 'HttpRequest',
                   'History', 'MigrationHistory']
-        records = [0, 0, 30, 0, 1, 10, 1, 0, 12, 0]
+        records = [Session, LogEntry, Permission, Group, User,
+                   ContentType, Bio, HttpRequest, History, MigrationHistory]
+        records = [num.objects.count() for num in records]
         for out, name, count in zip(stdout.split('\n'), models, records):
             out = out.strip().split()
             self.assertEqual(out[0], name)
