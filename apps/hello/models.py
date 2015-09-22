@@ -55,7 +55,7 @@ class HttpRequest(models.Model):
     time = models.DateTimeField('Time', auto_now_add=True)
     header = models.TextField('Header')
     is_read = models.BooleanField('Is read', default=False)
-    priority = models.BooleanField('Priority', default=False)
+    priority = models.NullBooleanField('Priority', default=False)
 
     objects = HttpRequestManager()
 
