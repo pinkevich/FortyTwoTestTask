@@ -44,7 +44,7 @@ class HttpRequestTests(BaseTestCase):
         json_resp = self.json_response(resp)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(len(json_resp), 10)
-        for num, resp in enumerate(reversed(json_resp), start=1):
+        for num, resp in enumerate(json_resp, start=1):
             header = ast.literal_eval(resp['fields']['header'])
             self.assertEqual(resp['pk'], num)
             self.assertEqual(resp['fields']['is_read'], False)

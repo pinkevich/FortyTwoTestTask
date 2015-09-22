@@ -26,7 +26,7 @@ header_filter = (
 INFO, DEBUG = range(1, 3)
 
 
-def save_requests(mode=INFO):
+def save_requests(mode=INFO, priority=False):
     """
     Default mode: INFO
     Use:
@@ -49,9 +49,12 @@ def save_requests(mode=INFO):
                     raise Exception(
                         'Use INFO or DEBUG mode in save_requests decorator'
                     )
-                HttpRequest.objects.create(ip=request.META.get('REMOTE_ADDR'),
-                                           page=request.build_absolute_uri(),
-                                           header=header)
+                req = HttpRequest(ip=request.META.get('REMOTE_ADDR'),
+                                  page=request.build_absolute_uri(),
+                                  header=header)
+                if priority:
+                    req.priority = True
+                req.save()
             return func(request, *args, **kwargs)
 
         return inner
