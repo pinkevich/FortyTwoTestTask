@@ -32,7 +32,7 @@ def http_requests(request):
     return render(request, 'requests.html')
 
 
-@save_requests()
+@save_requests(priority=True)
 @login_required()
 def edit(request):
     form = BioEditForm(instance=Bio.objects.first())
