@@ -1,9 +1,16 @@
+from io import BytesIO
+
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
 from django.template import Template, Context, TemplateSyntaxError
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission, Group
+from django.contrib.sessions.models import Session
+from django.contrib.admin.models import LogEntry, ContentType
+
+from south.models import MigrationHistory
 
 from .tests import BaseTestCase
-from ..models import History, HttpRequest
+from ..models import History, HttpRequest, Bio
 
 
 class TagTests(BaseTestCase):
@@ -32,6 +39,38 @@ class TagTests(BaseTestCase):
             self.assertRaises(TemplateSyntaxError, rendered)
             rendered = self.render_edit_link_tag('test')
             self.assertRaises(TemplateSyntaxError, rendered)
+
+
+class CommandTests(BaseTestCase):
+
+    def test_projectmodels(self):
+        """
+        Test working projectmodels command
+        """
+        stdout = BytesIO()
+        stderr = BytesIO()
+        call_command('projectmodels', stdout=stdout, stderr=stderr)
+        stdout = stdout.getvalue()
+        self.assertIn('Session -', stdout)
+        self.assertNotIn('error: ', stdout)
+        models = ['Session', 'LogEntry', 'Permission', 'Group',
+                  'User', 'ContentType', 'Bio', 'HttpRequest',
+                  'History', 'MigrationHistory']
+        records = [Session, LogEntry, Permission, Group, User,
+                   ContentType, Bio, HttpRequest, History, MigrationHistory]
+        records = [num.objects.count() for num in records]
+        for out, name, count in zip(stdout.split('\n'), models, records):
+            out = out.strip().split()
+            self.assertEqual(out[0], name)
+            self.assertEqual(out[2], str(count))
+
+        stderr = stderr.getvalue()
+        self.assertIn('error: Session -', stderr)
+        for err, name, count in zip(stderr.split('\n'), models, records):
+            err = err.strip().split()
+            self.assertEqual(err[0], 'error:')
+            self.assertEqual(err[1], name)
+            self.assertEqual(err[3], str(count))
 
 
 class SignalTests(BaseTestCase):
