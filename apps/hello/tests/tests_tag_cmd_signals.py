@@ -23,6 +23,7 @@ class TagTests(BaseTestCase):
     def test_edit_link_tag(self):
         """
         Test success working edit_link tag
+
         """
         user = User.objects.get(username='admin')
         info = user._meta.app_label, user._meta.model_name
