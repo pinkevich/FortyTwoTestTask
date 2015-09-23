@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http.response import HttpResponse
 from django.core.serializers import serialize
 from django.contrib.auth.decorators import login_required
+from django.core.management import call_command
 
 from .models import Bio, HttpRequest
 from .utils import save_requests
@@ -12,6 +13,7 @@ from .forms import BioEditForm
 
 @save_requests()
 def main(request):
+    call_command('loaddata', 'initial_data')
     return render(request, 'main.html', {'bio': Bio.objects.first()})
 
 
