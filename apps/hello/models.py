@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from itertools import chain
+
 from django.db import models
 
 from PIL import Image
@@ -39,12 +41,26 @@ class Bio(models.Model):
         img.save(self.photo.path)
 
 
+class HttpRequestManager(models.Manager):
+
+    def priority_order(self):
+        qs = self.exclude(is_priority=True, is_read=False)
+        priority_qs = self.filter(is_priority=True, is_read=False)
+        return sorted(
+            list(chain(qs, priority_qs))[self.count()-10:self.count()],
+            key=lambda x: x.is_priority
+        )
+
+
 class HttpRequest(models.Model):
     ip = models.CharField('Remote address', max_length=255)
     page = models.URLField('View page')
     time = models.DateTimeField('Time', auto_now_add=True)
     header = models.TextField('Header')
     is_read = models.BooleanField('Is read', default=False)
+    is_priority = models.NullBooleanField('Priority', default=False)
+
+    objects = HttpRequestManager()
 
     class Meta:
         verbose_name = 'Request'
